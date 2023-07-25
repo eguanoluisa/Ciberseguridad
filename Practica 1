@@ -1,0 +1,29 @@
+import json
+from flask import Flask, Response, request
+app = Flask(__name__)
+@app.route("/")
+def hello_world():
+@app.route("/api/stock")
+def get_stock_price():
+company_ticker = request.args.get("ticker")
+    try:
+    last_price = get_last_price(ticker=company_ticker)
+except ValueError as error:
+return {"company_ticker": company_ticker, "price": None, 'error': str(error)}
+response_raw = {"company_ticker": company_ticker, "price": last_price}
+return Response(json.dumps(response_raw), mimetype='application/json')
+if __name__ == "__main__":     app.run(host='127.0.0.1', port=3000, debug=True)
+
+import requests
+def get_last_price(ticker: str) -> float:
+    """     Esta funcion busca usando la API de yahoo finance el ultimo precio disponible del instrumento cuyo ticker es 'ticker'.    @:param ticker: ticker de la empresa a consultar     """
+yahoo_finance_url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
+# yahoo_finance_url = "https://query1.finance.yahoo.com/v8/finance/chart/" + ticker  # lo mismo que arriba
+
+headers = {'User-agent': 'Mozilla/5.0'}
+r = requests.get(url=yahoo_finance_url, headers=headers)
+if r.json().get('result') is None:
+    raise ValueError(f"ticker: '{ticker}' not found")
+    price = r.json().get('chart').get('result')[0].get('meta').get('regularMarketPrice')
+    return Price
+
